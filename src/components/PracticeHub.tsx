@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { db } from '../db'
+import type { WordBook } from '../types'
 import SpellingPractice from './SpellingPractice'
 import Dictation from './Dictation'
 import WordMatch from './WordMatch'
@@ -16,15 +18,39 @@ type Mode = typeof modes[number]['key']
 
 export default function PracticeHub() {
   const [mode, setMode] = useState<Mode | null>(null)
+  const [books, setBooks] = useState<WordBook[]>([])
+  const [activeBookId, setActiveBookId] = useState<string | null>(null)
 
-  if (mode === 'spelling') return <SpellingPractice onBack={() => setMode(null)} />
-  if (mode === 'dictation') return <Dictation onBack={() => setMode(null)} />
-  if (mode === 'match') return <WordMatch onBack={() => setMode(null)} />
-  if (mode === 'crossword') return <Crossword onBack={() => setMode(null)} />
+  useEffect(() => {
+    db.wordBooks.toArray().then(bookList => {
+      setBooks(bookList)
+      if (bookList.length > 0) setActiveBookId(bookList[0].id)
+    })
+  }, [])
+
+  if (mode === 'spelling') return <SpellingPractice onBack={() => setMode(null)} bookId={activeBookId || ''} />
+  if (mode === 'dictation') return <Dictation onBack={() => setMode(null)} bookId={activeBookId || ''} />
+  if (mode === 'match') return <WordMatch onBack={() => setMode(null)} bookId={activeBookId || ''} />
+  if (mode === 'crossword') return <Crossword onBack={() => setMode(null)} bookId={activeBookId || ''} />
 
   return (
     <div className="page">
       <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16 }}>✏️ 练习</h2>
+
+      {books.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          {books.map(b => (
+            <button
+              key={b.id}
+              className={`btn ${activeBookId === b.id ? 'btn-primary' : 'btn-outline'}`}
+              style={{ padding: '6px 14px', fontSize: 12 }}
+              onClick={() => setActiveBookId(b.id)}
+            >
+              {b.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {modes.map(m => (

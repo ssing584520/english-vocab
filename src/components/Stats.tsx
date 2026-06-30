@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { db } from '../db'
-import type { ReviewRecord, Word, DictationRecord } from '../types'
+import type { ReviewRecord, Word, DictationRecord, WordBook } from '../types'
 import ReviewSession from './ReviewSession'
 import WordDetail from './WordDetail'
 
@@ -13,20 +13,42 @@ export default function Stats() {
   const [wrongReviewList, setWrongReviewList] = useState<ReviewRecord[]>([])
   const [detailWord, setDetailWord] = useState<Word | null>(null)
   const [showMastered, setShowMastered] = useState(false)
+  const [books, setBooks] = useState<WordBook[]>([])
+  const [activeBookId, setActiveBookId] = useState<string | null>(null)
 
   useEffect(() => {
-    Promise.all([
+    loadBooks()
+  }, [])
+
+  useEffect(() => {
+    if (activeBookId) {
+      loadReviews()
+    }
+  }, [activeBookId])
+
+  async function loadBooks() {
+    const [bookList, w] = await Promise.all([
+      db.wordBooks.toArray(),
+      db.words.toArray(),
+    ])
+    setBooks(bookList)
+    setWords(new Map(w.map(x => [x.id, x])))
+    if (bookList.length > 0) {
+      setActiveBookId(bookList[0].id)
+    }
+  }
+
+  async function loadReviews() {
+    const [r, d] = await Promise.all([
       db.reviews.toArray(),
       db.dictations.toArray(),
-      db.words.toArray(),
-      db.words.count(),
-    ]).then(([r, d, w, c]) => {
-      setReviews(r)
-      setDictations(d)
-      setWords(new Map(w.map(x => [x.id, x])))
-      setTotalWords(c)
-    })
-  }, [])
+    ])
+    const bookR = r.filter(rev => rev.bookId === activeBookId)
+    setReviews(bookR)
+    setDictations(d)
+    const book = books.find(b => b.id === activeBookId)
+    setTotalWords(book ? book.wordIds.length : 0)
+  }
 
   const mastered = reviews.filter(r => r.status === 'mastered').length
   const reviewing = reviews.filter(r => r.status === 'reviewing').length
@@ -70,25 +92,12 @@ export default function Stats() {
   weekAgo.setHours(0, 0, 0, 0)
   const weekReviews = reviews.filter(r => r.lastReview >= weekAgo.getTime()).length
 
-  async function refresh() {
-    const [r, d, w, c] = await Promise.all([
-      db.reviews.toArray(),
-      db.dictations.toArray(),
-      db.words.toArray(),
-      db.words.count(),
-    ])
-    setReviews(r)
-    setDictations(d)
-    setWords(new Map(w.map(x => [x.id, x])))
-    setTotalWords(c)
-  }
-
   if (reviewingWrong && wrongReviewList.length > 0) {
     return (
       <ReviewSession
         words={words}
         dueReviews={wrongReviewList}
-        onComplete={() => { setReviewingWrong(false); refresh() }}
+        onComplete={() => { setReviewingWrong(false); loadReviews() }}
       />
     )
   }
@@ -96,6 +105,21 @@ export default function Stats() {
   return (
     <div className="page">
       <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16 }}>📊 学习统计</h2>
+
+      {books.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+          {books.map(b => (
+            <button
+              key={b.id}
+              className={`btn ${activeBookId === b.id ? 'btn-primary' : 'btn-outline'}`}
+              style={{ padding: '6px 14px', fontSize: 12 }}
+              onClick={() => setActiveBookId(b.id)}
+            >
+              {b.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
         <div className="card" style={{ textAlign: 'center', padding: 16 }}>

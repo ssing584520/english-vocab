@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { db } from '../db'
-import { defaultWords, defaultBook, sampleBooks } from '../wordBank'
+import { defaultWords, grade4Words, defaultBook, grade4Book, sampleBooks } from '../wordBank'
 import { createReviewRecord, calcStreak } from '../srs'
 import { loadSettings, saveSettings as saveSettingsUtil } from '../settings'
 import type { UserSettings } from '../types'
@@ -30,11 +30,13 @@ export default function Profile() {
     await db.dailyLogs.clear()
     await db.dictations.clear()
 
-    await db.words.bulkAdd(defaultWords)
+    await db.words.bulkPut(defaultWords)
+    await db.words.bulkPut(grade4Words)
     await db.wordBooks.add(defaultBook)
     await db.wordBooks.bulkAdd(sampleBooks)
-    const reviews = defaultWords.map(w => createReviewRecord(w.id, defaultBook.id))
-    await db.reviews.bulkAdd(reviews)
+    const reviews1 = defaultWords.map(w => createReviewRecord(w.id, defaultBook.id))
+    const reviews2 = grade4Words.map(w => createReviewRecord(w.id, grade4Book.id))
+    await db.reviews.bulkAdd([...reviews1, ...reviews2])
 
     alert('已重置数据！')
     window.location.reload()

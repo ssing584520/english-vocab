@@ -6,9 +6,10 @@ import { updateReviewRecord } from '../srs'
 
 interface Props {
   onBack: () => void
+  bookId: string
 }
 
-export default function SpellingPractice({ onBack }: Props) {
+export default function SpellingPractice({ onBack, bookId }: Props) {
   const [words, setWords] = useState<Word[]>([])
   const [reviews, setReviews] = useState<Map<string, ReviewRecord>>(new Map())
   const [index, setIndex] = useState(0)
@@ -20,14 +21,15 @@ export default function SpellingPractice({ onBack }: Props) {
     async function load() {
       const allReviews = await db.reviews.toArray()
       const studyingIds = allReviews.filter(r =>
-        r.status !== 'new' && r.status !== 'mastered'
+        r.status !== 'new' && r.status !== 'mastered' && r.bookId === bookId
       ).map(r => r.wordId)
       const allWords = await db.words.toArray()
       let pool = allWords.filter(w => studyingIds.includes(w.id))
       if (pool.length < 5) pool = allWords
       const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 20)
       setWords(shuffled)
-      const reviewMap = new Map(allReviews.map(r => [r.wordId, r]))
+      const bookReviews = allReviews.filter(r => r.bookId === bookId)
+      const reviewMap = new Map(bookReviews.map(r => [r.wordId, r]))
       setReviews(reviewMap)
     }
     load()

@@ -19,7 +19,7 @@ function shuffle<T>(a: T[]): T[] {
   return b
 }
 
-export default function WordMatch({ onBack }: { onBack: () => void }) {
+export default function WordMatch({ onBack, bookId }: { onBack: () => void; bookId: string }) {
   const [cards, setCards] = useState<Card[]>([])
   const [flipped, setFlipped] = useState<string[]>([])
   const [moves, setMoves] = useState(0)
@@ -30,7 +30,7 @@ export default function WordMatch({ onBack }: { onBack: () => void }) {
     async function load() {
       const reviews = await db.reviews.toArray()
       const studyingIds = reviews.filter(r =>
-        r.status !== 'new' && r.status !== 'mastered'
+        r.status !== 'new' && r.status !== 'mastered' && r.bookId === bookId
       ).map(r => r.wordId)
       const allWords = await db.words.toArray()
       const studying = allWords.filter(w => studyingIds.includes(w.id))

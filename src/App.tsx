@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { TabName } from './types'
 import { db } from './db'
-import { defaultWords, defaultBook, sampleBooks } from './wordBank'
+import { defaultWords, grade4Words, defaultBook, grade4Book, sampleBooks } from './wordBank'
 import { createReviewRecord } from './srs'
 import Home from './components/Home'
 import WordList from './components/WordList'
@@ -23,18 +23,26 @@ export default function App() {
 
   useEffect(() => {
     async function init() {
-      const bookCount = await db.wordBooks.count()
-      if (bookCount === 0) {
-        await db.words.bulkAdd(defaultWords)
-        await db.wordBooks.add(defaultBook)
-        await db.wordBooks.bulkAdd(sampleBooks)
-        const reviews = defaultWords.map(w =>
-          createReviewRecord(w.id, defaultBook.id)
-        )
-        await db.reviews.bulkAdd(reviews)
-      } else {
-        // Sync latest enrichment data from wordBank.ts into IndexedDB
-        await db.words.bulkPut(defaultWords)
+      try {
+        const bookCount = await db.wordBooks.count()
+        if (bookCount === 0) {
+          await db.words.bulkPut(defaultWords)
+          await db.words.bulkPut(grade4Words)
+          await db.wordBooks.add(defaultBook)
+          await db.wordBooks.bulkAdd(sampleBooks)
+          const reviews1 = defaultWords.map(w =>
+            createReviewRecord(w.id, defaultBook.id)
+          )
+          const reviews2 = grade4Words.map(w =>
+            createReviewRecord(w.id, grade4Book.id)
+          )
+          await db.reviews.bulkAdd([...reviews1, ...reviews2])
+        } else {
+          // Sync latest enrichment data from wordBank.ts into IndexedDB
+          await db.words.bulkPut([...defaultWords, ...grade4Words])
+        }
+      } catch (e) {
+        console.error('init error', e)
       }
       setReady(true)
     }

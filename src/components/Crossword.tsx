@@ -137,7 +137,7 @@ function canPlace(g: (Cell | null)[][], word: string, row: number, col: number, 
   return true
 }
 
-export default function Crossword({ onBack }: { onBack: () => void }) {
+export default function Crossword({ onBack, bookId }: { onBack: () => void; bookId: string }) {
   const [game, setGame] = useState<{ grid: Cell[][]; placed: PlacedWord[]; clues: { across: PlacedWord[]; down: PlacedWord[] } } | null>(null)
   const [inputs, setInputs] = useState<Map<string, string>>(new Map())
   const [activeCell, setActiveCell] = useState<{ row: number; col: number } | null>(null)
@@ -149,7 +149,7 @@ export default function Crossword({ onBack }: { onBack: () => void }) {
     async function load() {
       const reviews = await db.reviews.toArray()
       const studyingIds = reviews.filter(r =>
-        r.status !== 'new' && r.status !== 'mastered'
+        r.status !== 'new' && r.status !== 'mastered' && r.bookId === bookId
       ).map(r => r.wordId)
       const allWords = await db.words.toArray()
       const studying = allWords.filter(w => studyingIds.includes(w.id))

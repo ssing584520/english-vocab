@@ -6,9 +6,10 @@ import { updateReviewRecord } from '../srs'
 
 interface Props {
   onBack: () => void
+  bookId: string
 }
 
-export default function Dictation({ onBack }: Props) {
+export default function Dictation({ onBack, bookId }: Props) {
   const [words, setWords] = useState<Word[]>([])
   const [index, setIndex] = useState(0)
   const [input, setInput] = useState('')
@@ -21,7 +22,7 @@ export default function Dictation({ onBack }: Props) {
     async function load() {
       const allReviews = await db.reviews.toArray()
       const studyingIds = allReviews.filter(r =>
-        r.status !== 'new' && r.status !== 'mastered'
+        r.status !== 'new' && r.status !== 'mastered' && r.bookId === bookId
       ).map(r => r.wordId)
       const allWords = await db.words.toArray()
       let pool = allWords.filter(w => studyingIds.includes(w.id))
