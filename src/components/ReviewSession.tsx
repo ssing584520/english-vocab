@@ -31,7 +31,6 @@ export default function ReviewSession({ words, dueReviews, onComplete }: Props) 
     if (!record || !word) return
     const updated = updateReviewRecord(record, correct)
     await db.reviews.put(updated)
-    setResults(r => [...r, { wordId: word.id, correct }])
     if (correct) {
       setStreak(s => s + 1)
       if (streak >= 2) setStars(s => s + 1)

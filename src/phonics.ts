@@ -76,13 +76,6 @@ const KNOWN_SPLITS: Record<string, string[]> = {
   yesterday: ['yes','ter','day'],
 }
 
-function hasVowel(s: string): boolean {
-  for (const ch of s) {
-    if (VOWELS.has(ch)) return true
-  }
-  return false
-}
-
 /** Count vowel groups (consecutive vowels = 1 sound) */
 function countVowelGroups(w: string): number {
   let count = 0
