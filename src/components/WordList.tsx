@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { db } from '../db'
 import type { Word, WordBook } from '../types'
-import { displaySyllables, getWordSyllables } from '../phonics'
+import { getWordSyllables } from '../phonics'
 import WordDetail from './WordDetail'
 
 const SYLLABLE_COLORS = ['#F5A0D0', '#5D9CEC', '#A0D6A0', '#F5C080', '#9B59B6', '#F5D76E']

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import type { Word } from '../types'
 import { db } from '../db'
 
 interface Card {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { db } from '../db'
-import type { Word, ReviewRecord } from '../types'
+import type { Word } from '../types'
 import { speakWord } from '../tts'
 import { updateReviewRecord } from '../srs'
 

@@ -35,7 +35,6 @@ export default function Stats() {
 
   const totalRevNum = reviews.reduce((s, r) => s + r.totalReviews, 0)
   const totalCorrect = reviews.reduce((s, r) => s + r.correctCount, 0)
-  const totalWrong = reviews.reduce((s, r) => s + r.wrongCount, 0)
   const accuracy = totalRevNum > 0 ? Math.round(totalCorrect / totalRevNum * 100) : 0
 
   /** Words with any wrong answer, sorted by worst first */

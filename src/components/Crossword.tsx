@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import type { Word, ReviewRecord } from '../types'
+import type { Word } from '../types'
 import { db } from '../db'
 
 interface PlacedWord {
@@ -78,7 +78,6 @@ function placeWords(words: Word[]): { grid: Cell[][]; placed: PlacedWord[]; clue
     }
 
     if (!best) {
-      const offset = placed.length * 2
       best = { row: 2, col: size - word.length - 1, dir: 'across' }
       if (best.col < 0) best.col = 0
     }
@@ -330,11 +329,11 @@ export default function Crossword({ onBack }: { onBack: () => void }) {
       {game.clues.across.length > 0 && (
         <div className="card" style={{ padding: 12, marginBottom: 8 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--blue)', marginBottom: 6 }}>→ 横向 (Across)</div>
-          {game.clues.across.map((pw, i) => {
-            const filled = pw.word.split('').every((_, i) => {
-              const r = pw.dir === 'across' ? pw.row : pw.row + i
-              const c = pw.dir === 'across' ? pw.col + i : pw.col
-              return inputs.get(`${r},${c}`) === pw.word[i]
+          {game.clues.across.map((pw) => {
+            const filled = pw.word.split('').every((_, idx) => {
+              const r = pw.dir === 'across' ? pw.row : pw.row + idx
+              const c = pw.dir === 'across' ? pw.col + idx : pw.col
+              return inputs.get(`${r},${c}`) === pw.word[idx]
             })
             return (
               <div key={pw.wordId} style={{ marginBottom: 4, color: filled ? 'var(--green)' : 'var(--text)' }}>
@@ -351,11 +350,11 @@ export default function Crossword({ onBack }: { onBack: () => void }) {
       {game.clues.down.length > 0 && (
         <div className="card" style={{ padding: 12, marginBottom: 8 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--pink)', marginBottom: 6 }}>↓ 纵向 (Down)</div>
-          {game.clues.down.map((pw, i) => {
-            const filled = pw.word.split('').every((_, i) => {
-              const r = pw.dir === 'across' ? pw.row : pw.row + i
-              const c = pw.dir === 'across' ? pw.col + i : pw.col
-              return inputs.get(`${r},${c}`) === pw.word[i]
+          {game.clues.down.map((pw) => {
+            const filled = pw.word.split('').every((_, idx) => {
+              const r = pw.dir === 'across' ? pw.row : pw.row + idx
+              const c = pw.dir === 'across' ? pw.col + idx : pw.col
+              return inputs.get(`${r},${c}`) === pw.word[idx]
             })
             return (
               <div key={pw.wordId} style={{ marginBottom: 4, color: filled ? 'var(--green)' : 'var(--text)' }}>

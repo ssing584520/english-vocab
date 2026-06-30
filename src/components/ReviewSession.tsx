@@ -19,7 +19,6 @@ export default function ReviewSession({ words, dueReviews, onComplete }: Props) 
   const [index, setIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [showDetail, setShowDetail] = useState(false)
-  const [results, setResults] = useState<{ wordId: string; correct: boolean }[]>([])
   const [streak, setStreak] = useState(0)
   const [stars, setStars] = useState(0)
 
