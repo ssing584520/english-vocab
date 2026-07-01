@@ -43,6 +43,7 @@ export interface Word {
   phrases?: WordPhrase[]
   inflections?: WordInflections
   synonyms?: { word: string; zh?: string }[]
+  antonyms?: { word: string; zh?: string }[]
   similarWords?: { word: string; reason?: string; zh?: string }[]
   frequency?: number
   tags?: string[]

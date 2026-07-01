@@ -109,6 +109,48 @@ export default function WordDetail({ word }: Props) {
         </Section>
       )}
 
+      {/* Derived words (拓展) */}
+      {(() => {
+        const derived = word.similarWords?.filter(s => s.reason === '拓展') ?? []
+        if (derived.length === 0) return null
+        return (
+          <Section title="🌱 派生词">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {derived.map((s, i) => (
+                <span key={i} style={{
+                  fontSize: 14, fontWeight: 600,
+                  background: '#E8F5E9', color: '#2E7D32',
+                  padding: '4px 12px', borderRadius: 16,
+                }}>
+                  {s.word}{s.zh ? <span style={{ marginLeft: 4, opacity: 0.8 }}>（{s.zh}）</span> : ''}
+                </span>
+              ))}
+            </div>
+          </Section>
+        )
+      })()}
+
+      {/* Similar Words (形近词) */}
+      {(() => {
+        const similar = word.similarWords?.filter(s => s.reason !== '拓展') ?? []
+        if (similar.length === 0) return null
+        return (
+          <Section title="🔍 形近词">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {similar.map((s, i) => (
+                <span key={i} style={{
+                  fontSize: 14, fontWeight: 600,
+                  background: '#FFF3E0', color: '#E65100',
+                  padding: '4px 12px', borderRadius: 16,
+                }}>
+                  {s.word}{s.zh ? <span style={{ marginLeft: 4, opacity: 0.8 }}>（{s.zh}）</span> : ''}
+                </span>
+              ))}
+            </div>
+          </Section>
+        )
+      })()}
+
       {/* Synonyms */}
       {word.synonyms && word.synonyms.length > 0 && (
         <Section title="🔀 近义词">
@@ -126,15 +168,14 @@ export default function WordDetail({ word }: Props) {
         </Section>
       )}
 
-      {/* Similar Words */}
-      {word.similarWords && word.similarWords.length > 0 && (
-        <Section title="🔍 形近词">
+      {/* Antonyms */}
+      {word.antonyms && word.antonyms.length > 0 && (
+        <Section title="⚡ 反义词">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {word.similarWords.map((s, i) => (
+            {word.antonyms.map((s, i) => (
               <span key={i} style={{
                 fontSize: 14, fontWeight: 600,
-                background: s.reason === '拓展' ? '#E8F5E9' : '#FFF3E0',
-                color: s.reason === '拓展' ? '#2E7D32' : '#E65100',
+                background: '#FCE4EC', color: '#C62828',
                 padding: '4px 12px', borderRadius: 16,
               }}>
                 {s.word}{s.zh ? <span style={{ marginLeft: 4, opacity: 0.8 }}>（{s.zh}）</span> : ''}
